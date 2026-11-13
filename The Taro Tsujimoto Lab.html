@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Taro Tsujimoto Lab</title>
+<style>
+:root{--navy:#002654;--gold:#FCB514;--bg:#f2f5fa;--ink:#0f1c33;--mute:#56627a;--card:#fff;--line:#d3dae8;--seg:#002654;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#071327;--ink:#e8eefb;--mute:#9fb0d3;--card:#0e2142;--line:#223a68;--seg:#6f9bff;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#071327;--ink:#e8eefb;--mute:#9fb0d3;--card:#0e2142;--line:#223a68;--seg:#6f9bff;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:var(--navy);color:#fff;border-bottom:6px solid var(--gold)}
+.wrap{max-width:900px;margin:0 auto;padding:0 18px}
+header .wrap{padding-top:30px;padding-bottom:26px}
+h1,h2{font-family:"Iowan Old Style",Georgia,"Times New Roman",serif;line-height:1.1;margin:0}
+h1{font-size:clamp(34px,7vw,58px)}h2{font-size:26px;margin-bottom:4px}
+p{margin:.5em 0;max-width:70ch}
+header p{color:#d5e0f7}
+.sub,.note{color:var(--mute)}.note{font-size:13px}
+.led{display:flex;align-items:baseline;gap:10px;margin-top:18px;font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--gold)}
+.led b{font-size:clamp(54px,14vw,96px);line-height:1;text-shadow:0 0 16px rgba(252,181,20,.5)}
+.led span{color:#fff;font-size:18px}
+main{padding-bottom:60px}section{margin-top:42px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;margin-top:10px}
+.ctl{display:grid;grid-template-columns:190px 1fr 78px;gap:10px;align-items:center;margin:8px 0}
+.ctl output{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-top:14px}
+.stat{border-left:4px solid var(--gold);padding:2px 0 2px 10px}
+.stat strong{display:block;font-size:24px;font-variant-numeric:tabular-nums}.stat small{color:var(--mute)}
+.bar{display:grid;grid-template-columns:170px 1fr 70px;gap:10px;align-items:center;margin:7px 0;font-size:14px}
+.track{background:var(--line);height:16px;border-radius:3px;overflow:hidden}
+.fill{height:100%;background:var(--seg);transition:width .25s}.fill.me{background:var(--gold)}
+.bar span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.stack{display:flex;height:34px;border-radius:4px;overflow:hidden;margin:12px 0 6px;border:1px solid var(--line)}
+.stack div{display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;overflow:hidden;white-space:nowrap;transition:flex-grow .25s}
+.stack div:nth-child(1){background:#002654}.stack div:nth-child(2){background:#1d4a9c}.stack div:nth-child(3){background:#3d6bc4}.stack div:nth-child(4){background:#b8860b}.stack div:nth-child(5){background:#d99a00}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-weight:600;background:var(--navy);color:#fff;border:2px solid var(--navy);border-radius:6px;padding:9px 15px;cursor:pointer}
+button.alt{background:transparent;color:var(--ink);border-color:var(--gold)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button:not(.alt){background:var(--gold);border-color:var(--gold);color:#1a1300}}
+:root[data-theme="dark"] button:not(.alt){background:var(--gold);border-color:var(--gold);color:#1a1300}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}
+.scroll{overflow-x:auto}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.two>*{min-width:0}
+.hist{display:flex;align-items:flex-end;gap:2px;height:120px;margin-top:12px}
+.hist div{flex:1;background:var(--seg);min-width:2px;border-radius:2px 2px 0 0}.hist div.hit{background:var(--gold)}
+@media(max-width:600px){.ctl{grid-template-columns:1fr 70px}.ctl label{grid-column:1/-1}.bar{grid-template-columns:116px 1fr 60px}.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>The Taro Tsujimoto Lab</h1>
+<p>An analytics and biomechanics project on hockey’s most famous nonexistent player, the Buffalo Sabres’ imaginary 11th-round pick in the 1974 NHL draft.</p>
+<div class="led" aria-live="polite"><b id="mph">95</b><span>mph shot</span></div>
+</div></header>
+<main class="wrap">
+
+<section>
+<h2>The legend</h2>
+<div class="card">
+<p>In 1974 the Sabres announced Taro Tsujimoto, a forward from the “Tokyo Katanas,” with the 183rd pick in the 11th round. Katana is a loose translation of “sabre,” and neither the player nor the team existed. Reports credit general manager Punch Imlach, with PR director Paul Wieland helping come up with the name, and Panini even issued a rookie card for him in 2010-11. One account gives him 15 goals and 25 points in his draft year, so that is the bar this lab measures against.</p>
+<p class="note">Unlike Sidd Finch, the legend gives Tsujimoto no signature skill. Every ability setting below is a hypothetical you choose.</p>
+</div>
+</section>
+
+<section>
+<h2>1. Shot lab</h2>
+<p class="sub">Set the shot and the goalie, then see how little time there is.</p>
+<div class="card">
+<div class="ctl"><label for="v">Shot speed</label><input id="v" type="range" min="40" max="120" value="95"><output id="vo"></output></div>
+<div class="ctl"><label for="d">Distance to the goalie (ft)</label><input id="d" type="range" min="15" max="60" value="35"><output id="do"></output></div>
+<div class="ctl"><label for="r">Goalie reaction (ms)</label><input id="r" type="range" min="140" max="260" value="180"><output id="ro"></output></div>
+<div class="ctl"><label for="a">Shots on net (%)</label><input id="a" type="range" min="20" max="90" value="55"><output id="ao"></output></div>
+<div class="stats">
+<div class="stat"><strong id="t"></strong><small>puck flight time</small></div>
+<div class="stat"><strong id="win"></strong><small>time after goalie reacts</small></div>
+<div class="stat"><strong id="sv"></strong><small>modeled save rate on target</small></div>
+<div class="stat"><strong id="gl"></strong><small>goal chance per shot</small></div>
+</div>
+<p class="note" id="msg"></p>
+</div>
+<div class="card"><b>Flight time over this distance (ms)</b><div id="bars"></div></div>
+</section>
+
+<section>
+<h2>2. Biomechanics: how a body makes a slap shot</h2>
+<p class="sub">The motion runs from the legs through the hips and trunk, into the arms, and down the bending stick into the puck. Each slider scales one link. The split of a 90 mph shot is a simplified teaching model.</p>
+<div class="card">
+<div class="ctl"><label for="k0">Legs and weight transfer</label><input id="k0" type="range" min="0.5" max="2" step="0.05" value="1"><output id="k0o"></output></div>
+<div class="ctl"><label for="k1">Hips and trunk rotation</label><input id="k1" type="range" min="0.5" max="2" step="0.05" value="1"><output id="k1o"></output></div>
+<div class="ctl"><label for="k2">Shoulders and arms</label><input id="k2" type="range" min="0.5" max="2" step="0.05" value="1"><output id="k2o"></output></div>
+<div class="ctl"><label for="k3">Stick flex</label><input id="k3" type="range" min="0.5" max="2" step="0.05" value="1"><output id="k3o"></output></div>
+<div class="ctl"><label for="k4">Hands and wrists</label><input id="k4" type="range" min="0.5" max="2" step="0.05" value="1"><output id="k4o"></output></div>
+<div class="btns"><button class="alt" id="pAvg">Average shooter</button><button id="pTaro">Hypothetical Tsujimoto</button></div>
+<div class="stack" id="stack" aria-hidden="true"></div>
+<p class="note" id="legend"></p>
+<div class="stats">
+<div class="stat"><strong id="bv"></strong><small>blade speed at contact</small></div>
+<div class="stat"><strong id="pv"></strong><small>puck speed</small></div>
+<div class="stat"><strong id="ke"></strong><small>puck kinetic energy</small></div>
+<div class="stat"><strong id="rec"></strong><small>of the 108.8 mph NHL record</small></div>
+</div>
+<div class="btns"><button class="alt" id="apply">Use this puck speed in the shot lab</button></div>
+<p id="bio"></p>
+</div>
+<div class="two">
+<div class="card"><b>Why the stick matters</b>
+<p>A slap shot loads the stick by driving the blade into the ice, and the shaft bends and then springs back as the puck leaves. That stored energy is the stick flex link.</p></div>
+<div class="card"><b>Puck versus blade</b>
+<p>The puck leaves faster than the blade moves because the stick is much heavier than the puck. This page uses a factor of 1.25, which is an assumption.</p></div>
+</div>
+</section>
+
+<section>
+<h2>3. Benchmarks</h2>
+<div class="card scroll"><table id="bench"><thead><tr><th>Shot</th><th>Speed (mph)</th><th>Flight at 35 ft (ms)</th><th>Energy (J)</th></tr></thead><tbody></tbody></table></div>
+<p class="note">The Chara and Weber speeds are from NHL All-Star skills events in 2012 and 2015. Typical wrist and slap shot speeds are rounded illustrative values.</p>
+</section>
+
+<section>
+<h2>4. Could he score 15?</h2>
+<p class="sub">Simulates full seasons using the shot lab settings. The legend’s 15 goals is the target.</p>
+<div class="card">
+<div class="ctl"><label for="g">Games played</label><input id="g" type="range" min="20" max="82" value="70"><output id="go"></output></div>
+<div class="ctl"><label for="s">Shots per game</label><input id="s" type="range" min="1" max="6" step="0.5" value="3"><output id="so"></output></div>
+<div class="btns"><button id="sim">Simulate 1,000 seasons</button></div>
+<div class="stats"><div class="stat"><strong id="mg">-</strong><small>average goals</small></div><div class="stat"><strong id="p15">-</strong><small>seasons with 15 or more goals</small></div></div>
+<div class="hist" id="hist" aria-label="Distribution of simulated season goal totals"></div>
+<p class="note" id="hnote">Run the simulation to see the spread of season goal totals. Gold bars are seasons with 15 or more goals.</p>
+</div>
+</section>
+
+<section>
+<h2>Method and limits</h2>
+<p>Flight time is distance divided by speed, ignoring drag and the puck’s flight path. The save model is a logistic curve on the time left after the goalie’s reaction and a fixed 100 ms save movement, tuned so an 80 mph shot from 35 ft against a 180 ms goalie is stopped 91 percent of the time. Goal chance multiplies the on-net rate by the miss rate. Blocks, screens, deflections, rebounds, and shot placement are not modeled. The kinetic chain split and puck factor are teaching assumptions. Nothing here predicts anything, because Taro Tsujimoto is fiction.</p>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const FPS=1.46667,PM=0.17,MOVE=100,K0=Math.log(.91/.09)-(35/(80*FPS)*1000-180-MOVE)/25;
+const flight=(v,d)=>d/(v*FPS)*1000, sig=x=>1/(1+Math.exp(-x));
+const save=(v,d,r)=>sig((flight(v,d)-r-MOVE)/25+K0);
+const ke=v=>0.5*PM*Math.pow(v*0.44704,2);
+function lab(){
+  const v=+$("v").value,d=+$("d").value,r=+$("r").value,a=+$("a").value/100;
+  $("mph").textContent=v;$("vo").textContent=v+" mph";$("do").textContent=d+" ft";$("ro").textContent=r+" ms";$("ao").textContent=Math.round(a*100)+"%";
+  const t=flight(v,d),sv=save(v,d,r),gl=a*(1-sv);
+  $("t").textContent=Math.round(t)+" ms";$("win").textContent=Math.round(t-r)+" ms";
+  $("sv").textContent=Math.round(sv*100)+"%";$("gl").textContent=(gl*100).toFixed(1)+"%";
+  $("msg").textContent=t-r<MOVE?"The puck arrives before the goalie can finish moving, so he is guessing.":"The goalie has enough time to react and move.";
+  const rows=[["Typical wrist shot",75],["Typical slap shot",90],["Chara record",108.8],["Your shot",v]],mx=flight(40,d);
+  $("bars").innerHTML=rows.map(([n,s],i)=>`<div class="bar"><span>${n}</span><div class="track"><div class="fill ${i==3?'me':''}" style="width:${flight(s,d)/mx*100}%"></div></div><span>${Math.round(flight(s,d))} ms</span></div>`).join("");
+}
+const base=[10,16,18,14,14],names=["Legs","Hips and trunk","Arms","Stick flex","Hands"],FACT=1.25;
+function chain(){
+  const k=[0,1,2,3,4].map(i=>+$("k"+i).value);k.forEach((x,i)=>$("k"+i+"o").textContent=x.toFixed(2)+"×");
+  const p=base.map((b,i)=>b*k[i]),bl=p.reduce((a,b)=>a+b,0),pv=bl*FACT;
+  $("stack").innerHTML=p.map((x,i)=>`<div style="flex-grow:${x}">${x/bl>.13?names[i]:""}</div>`).join("");
+  $("legend").textContent=names.map((n,i)=>`${n} ${p[i].toFixed(0)} mph`).join(", ");
+  $("bv").textContent=bl.toFixed(0)+" mph";$("pv").textContent=pv.toFixed(0)+" mph";$("ke").textContent=Math.round(ke(pv))+" J";$("rec").textContent=Math.round(pv/108.8*100)+"%";
+  $("bio").textContent=pv>108.8?"This shot would beat the NHL skills-event record of 108.8 mph.":pv>=100?"A shot in the range of the hardest in the league.":"A shot in the range of typical NHL slap shots or softer.";
+}
+const setK=a=>{a.forEach((x,i)=>$("k"+i).value=x);chain()};
+$("pAvg").onclick=()=>setK([1,1,1,1,1]);$("pTaro").onclick=()=>setK([1.15,1.2,1.2,1.2,1.15]);
+$("apply").onclick=()=>{const pv=Math.round(base.reduce((s,b,i)=>s+b*(+$("k"+i).value),0)*FACT);$("v").value=Math.max(40,Math.min(120,pv));lab()};
+["v","d","r","a"].forEach(i=>$(i).addEventListener("input",lab));
+[0,1,2,3,4].forEach(i=>$("k"+i).addEventListener("input",chain));
+function bench(){
+  $("bench").tBodies[0].innerHTML=[["Typical wrist shot",75],["Typical slap shot",90],["Shea Weber (2015)",108.5],["Zdeno Chara (2012 record)",108.8]].map(([n,v])=>`<tr><td>${n}</td><td>${v}</td><td>${Math.round(flight(v,35))}</td><td>${Math.round(ke(v))}</td></tr>`).join("");
+}
+function seasons(){
+  const v=+$("v").value,d=+$("d").value,r=+$("r").value,a=+$("a").value/100,g=+$("g").value,s=+$("s").value;
+  const pg=a*(1-save(v,d,r)),n=Math.round(g*s),tot=[];
+  for(let i=0;i<1000;i++){let c=0;for(let j=0;j<n;j++)if(Math.random()<pg)c++;tot.push(c)}
+  const mx=Math.max(...tot),bins=Array(mx+1).fill(0);tot.forEach(c=>bins[c]++);
+  const top=Math.max(...bins);
+  $("hist").innerHTML=bins.map((c,i)=>`<div class="${i>=15?'hit':''}" style="height:${c/top*100}%" title="${i} goals: ${c} seasons"></div>`).join("");
+  $("mg").textContent=(tot.reduce((x,y)=>x+y,0)/1000).toFixed(1);
+  $("p15").textContent=Math.round(tot.filter(c=>c>=15).length/10)+"%";
+  $("hnote").textContent=`${n} shots per season at ${(pg*100).toFixed(1)}% per shot. Bars run from 0 to ${mx} goals.`;
+}
+$("g").addEventListener("input",()=>$("go").textContent=$("g").value+" games");$("s").addEventListener("input",()=>$("so").textContent=$("s").value);
+$("go").textContent="70 games";$("so").textContent="3";$("sim").onclick=seasons;
+lab();chain();bench();
+</script>
+</body>
+</html>
